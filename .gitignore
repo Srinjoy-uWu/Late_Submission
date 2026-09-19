@@ -37,3 +37,8 @@ _SourcePacks/
 *.rar
 *.7z
 
+# Heavy external 3D asset packs (local-only, prevents LFS quota depletion)
+Assets/Imported Assets/
+Assets/Imported Assets.meta
+Assets/Models/
+Assets/Models.meta
