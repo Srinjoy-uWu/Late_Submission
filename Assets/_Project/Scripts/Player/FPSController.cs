@@ -45,6 +45,35 @@ namespace LateSubmission.Player
         private void Start()
         {
             SetCursorLock(true);
+
+            if (!string.IsNullOrEmpty(LateSubmission.Core.SceneTransitionManager.TargetSpawnPointName))
+            {
+                var targetSpawn = GameObject.Find(LateSubmission.Core.SceneTransitionManager.TargetSpawnPointName);
+                if (targetSpawn != null)
+                {
+                    Teleport(targetSpawn.transform.position, targetSpawn.transform.rotation);
+                }
+                LateSubmission.Core.SceneTransitionManager.TargetSpawnPointName = null;
+            }
+        }
+
+        public void Teleport(Vector3 position, Quaternion rotation)
+        {
+            if (_characterController != null)
+            {
+                _characterController.enabled = false;
+            }
+            transform.position = position;
+            transform.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
+            _pitch = 0f;
+            if (_playerCamera != null)
+            {
+                _playerCamera.transform.localRotation = Quaternion.identity;
+            }
+            if (_characterController != null)
+            {
+                _characterController.enabled = true;
+            }
         }
 
         private void Update()

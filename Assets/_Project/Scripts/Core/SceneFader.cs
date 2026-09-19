@@ -25,6 +25,10 @@ namespace LateSubmission.Core
                 return;
             }
             Instance = this;
+            if (transform.parent == null)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
 
             if (_canvasGroup == null)
             {
@@ -35,6 +39,16 @@ namespace LateSubmission.Core
             {
                 _canvasGroup.blocksRaycasts = false;
             }
+
+            SceneManager.sceneLoaded += OnSceneLoaded;
+        }
+
+        private void OnDestroy()
+        {
+            if (Instance == this)
+            {
+                SceneManager.sceneLoaded -= OnSceneLoaded;
+            }
         }
 
         private void Start()
@@ -43,6 +57,15 @@ namespace LateSubmission.Core
             {
                 _canvasGroup.alpha = 1f;
                 StartCoroutine(FadeRoutine(1f, 0f, _defaultFadeDuration, null));
+            }
+        }
+
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            if (_fadeInOnStart && _canvasGroup != null)
+            {
+                _canvasGroup.alpha = 1f;
+                FadeIn(_defaultFadeDuration);
             }
         }
 

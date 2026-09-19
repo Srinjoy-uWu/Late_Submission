@@ -44,6 +44,30 @@ namespace LateSubmission.Interaction
             _targetRotation = _closedRotation;
         }
 
+        public bool IsLocked => _isLocked;
+        public bool IsOpen => _isOpen;
+
+        public void SetLocked(bool locked, string message = null)
+        {
+            _isLocked = locked;
+            if (!string.IsNullOrEmpty(message))
+            {
+                _lockedMessage = message;
+            }
+        }
+
+        public void ForceCloseAndLock(string message = "Locked. Cannot turn back.")
+        {
+            _isOpen = false;
+            _isLocked = true;
+            _lockedMessage = message;
+            if (_doorHinge != null)
+            {
+                _targetRotation = _closedRotation;
+                _doorHinge.localRotation = _closedRotation;
+            }
+        }
+
         public string GetInteractionText()
         {
             if (_isLocked)

@@ -13,6 +13,7 @@ namespace LateSubmission.Interaction
     {
         [Header("Scene Destination")]
         [SerializeField] private string _targetSceneName = "Floor02";
+        [SerializeField] private string _destinationSpawnPoint = "";
         [SerializeField] private float _fadeDuration = 1.2f;
 
         [Header("Lock Settings")]
@@ -20,6 +21,16 @@ namespace LateSubmission.Interaction
         [SerializeField] private ItemType _requiredKey = ItemType.FacultyKey;
         [SerializeField] private string _lockedMessage = "Locked. Needs Key from Security Room.";
         [SerializeField] private string _unlockedPrompt = "Unlock & Proceed to Next Floor [E]";
+
+        public void Configure(string targetScene, string spawnPoint, bool isLocked, ItemType key, string lockedMsg, string unlockedPrompt)
+        {
+            _targetSceneName = targetScene;
+            _destinationSpawnPoint = spawnPoint;
+            _isLocked = isLocked;
+            _requiredKey = key;
+            _lockedMessage = lockedMsg;
+            _unlockedPrompt = unlockedPrompt;
+        }
 
         [Header("Audio")]
         [SerializeField] private AudioClip _unlockSfx;
@@ -40,7 +51,7 @@ namespace LateSubmission.Interaction
                 return _lockedMessage;
             }
 
-            return "Proceed to Next Floor [E]";
+            return _unlockedPrompt;
         }
 
         public bool CanInteract(Interactor interactor)
@@ -75,6 +86,10 @@ namespace LateSubmission.Interaction
         private void TriggerTransition()
         {
             _isTransitioning = true;
+            if (!string.IsNullOrEmpty(_destinationSpawnPoint))
+            {
+                SceneTransitionManager.TargetSpawnPointName = _destinationSpawnPoint;
+            }
 
             if (_unlockSfx != null)
             {

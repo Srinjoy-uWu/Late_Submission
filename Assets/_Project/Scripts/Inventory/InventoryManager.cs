@@ -29,6 +29,10 @@ namespace LateSubmission.Inventory
                 return;
             }
             Instance = this;
+            if (transform.parent == null)
+            {
+                DontDestroyOnLoad(gameObject);
+            }
         }
 
         public bool AddItem(ItemData item)

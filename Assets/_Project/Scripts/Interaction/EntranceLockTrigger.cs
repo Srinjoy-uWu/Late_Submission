@@ -26,8 +26,7 @@ namespace LateSubmission.Interaction
 
                 if (_entranceDoor != null)
                 {
-                    // Force door closed and locked
-                    _entranceDoor.gameObject.SetActive(true);
+                    _entranceDoor.ForceCloseAndLock("Locked. Cannot turn back now.");
                 }
 
                 if (_lockLatchSfx != null)
