@@ -65,7 +65,7 @@ namespace LateSubmission.Player
             }
             transform.position = position;
             transform.rotation = Quaternion.Euler(0, rotation.eulerAngles.y, 0);
-            _pitch = 0f;
+            _verticalRotation = 0f;
             if (_playerCamera != null)
             {
                 _playerCamera.transform.localRotation = Quaternion.identity;
