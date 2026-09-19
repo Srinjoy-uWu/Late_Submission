@@ -30,6 +30,10 @@
 sysinfo.txt
 crashlytics-build.properties
 
-# OS generated
-.DS_Store
-Thumbs.db
+# Local asset staging / raw downloaded packs (prevents LFS quota exhaustion)
+_RawAssets/
+_SourcePacks/
+*.zip
+*.rar
+*.7z
+
