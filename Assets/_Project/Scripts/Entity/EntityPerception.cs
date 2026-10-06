@@ -95,9 +95,9 @@ namespace LateSubmission.AI
                 return;
             }
 
-            if (Physics.Raycast(eyePos, dirToPlayer.normalized, out RaycastHit hit, distToPlayer, _occlusionMask))
+            if (Physics.Raycast(eyePos, dirToPlayer.normalized, out RaycastHit hit, distToPlayer, _occlusionMask, QueryTriggerInteraction.Ignore))
             {
-                if (hit.transform.CompareTag("Player") || hit.transform.IsChildOf(_playerTransform))
+                if (hit.transform.CompareTag("Player") || hit.transform.IsChildOf(_playerTransform) || hit.collider.GetComponentInParent<FPSController>() != null)
                 {
                     CanSeePlayer = true;
                     LastKnownPlayerPosition = _playerTransform.position;

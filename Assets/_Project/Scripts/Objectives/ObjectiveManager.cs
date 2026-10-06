@@ -34,6 +34,19 @@ namespace LateSubmission.Objectives
             if (InventoryManager.Instance != null)
             {
                 InventoryManager.Instance.OnItemAdded += HandleItemAdded;
+
+                // Sync objective when returning to Floor 01 corridor from Security Room or Cabin 104
+                if ((InventoryManager.Instance.HasItemType(ItemType.Floor02Key) ||
+                     InventoryManager.Instance.HasItemType(ItemType.AssignmentCoverSheet)) &&
+                    _currentObjective < ObjectiveType.ProceedToFloor2)
+                {
+                    _currentObjective = ObjectiveType.ProceedToFloor2;
+                }
+                else if (InventoryManager.Instance.HasItemType(ItemType.FacultyKey) &&
+                         _currentObjective < ObjectiveType.UnlockFacultyCabin)
+                {
+                    _currentObjective = ObjectiveType.UnlockFacultyCabin;
+                }
             }
             Workbench.OnLaserAssembled += HandleLaserAssembled;
 
@@ -55,13 +68,24 @@ namespace LateSubmission.Objectives
             UpdateObjectiveText();
         }
 
+        public void SetCustomObjective(string customText)
+        {
+            OnObjectiveUpdated?.Invoke(customText);
+        }
+
+        /// <summary>Causes the current objective text to be re-broadcast. Call after subscribing to OnObjectiveUpdated.</summary>
+        public void RefreshObjectiveText()
+        {
+            UpdateObjectiveText();
+        }
+
         private void HandleItemAdded(ItemData item)
         {
             if (item.ItemType == ItemType.FacultyKey && _currentObjective == ObjectiveType.FindFacultyKey)
             {
                 SetObjective(ObjectiveType.UnlockFacultyCabin);
             }
-            else if (item.ItemType == ItemType.AssignmentCoverSheet)
+            else if (item.ItemType == ItemType.AssignmentCoverSheet || item.ItemType == ItemType.Floor02Key)
             {
                 SetObjective(ObjectiveType.ProceedToFloor2);
             }
@@ -84,9 +108,9 @@ namespace LateSubmission.Objectives
                 ObjectiveType.FindFacultyKey => "Locate the Faculty Cabin Key at Security Desk",
                 ObjectiveType.UnlockFacultyCabin => "Unlock Faculty Cabin 104 in the Faculty Wing",
                 ObjectiveType.CollectCoverSheet => "Retrieve the Assignment Cover Sheet from the desk",
-                ObjectiveType.ProceedToFloor2 => "Take the Stairwell to Floor 2 (Mechatronics)",
-                ObjectiveType.CollectLaserComponents => "Find the 4 Laser Components across the Labs",
-                ObjectiveType.AssembleLaser => "Assemble the Prototype Laser at the Central Workbench",
+                ObjectiveType.ProceedToFloor2 => "Take the Stairwell to Floor 2 (Mechatronics & EC Labs)",
+                ObjectiveType.CollectLaserComponents => "Search Mechatronics & EC Labs for Light Gun Components",
+                ObjectiveType.AssembleLaser => "Assemble the Light Gun at the Central Workbench",
                 ObjectiveType.EscapeFloor2 => "Repel the Entity and Reach the Floor 3 Stairwell",
                 ObjectiveType.Completed => "Vertical Slice Complete",
                 _ => ""

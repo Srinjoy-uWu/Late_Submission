@@ -22,6 +22,9 @@ namespace LateSubmission.Interaction
         [SerializeField] private string _lockedMessage = "Locked. Needs Key from Security Room.";
         [SerializeField] private string _unlockedPrompt = "Unlock & Proceed to Next Floor [E]";
 
+        public bool IsLocked => _isLocked;
+        public ItemType RequiredKey => _requiredKey;
+
         public void Configure(string targetScene, string spawnPoint, bool isLocked, ItemType key, string lockedMsg, string unlockedPrompt)
         {
             _targetSceneName = targetScene;

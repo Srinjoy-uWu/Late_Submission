@@ -25,10 +25,11 @@ namespace LateSubmission.Core
                 return;
             }
             Instance = this;
-            if (transform.parent == null)
+            if (transform.parent != null)
             {
-                DontDestroyOnLoad(gameObject);
+                transform.SetParent(null);
             }
+            DontDestroyOnLoad(gameObject);
 
             if (_canvasGroup == null)
             {
@@ -108,7 +109,7 @@ namespace LateSubmission.Core
 
             while (elapsed < duration)
             {
-                elapsed += Time.deltaTime;
+                elapsed += Time.unscaledDeltaTime;
                 _canvasGroup.alpha = Mathf.Lerp(startAlpha, targetAlpha, elapsed / duration);
                 yield return null;
             }

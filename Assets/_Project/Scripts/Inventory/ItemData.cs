@@ -17,5 +17,13 @@ namespace LateSubmission.Inventory
         public string Description => _description;
         public ItemType ItemType => _itemType;
         public Sprite Icon => _icon;
+
+        public void Configure(ItemType itemType, string displayName, string description = "")
+        {
+            _itemType = itemType;
+            _displayName = displayName;
+            _description = description;
+            _itemId = itemType.ToString();
+        }
     }
 }

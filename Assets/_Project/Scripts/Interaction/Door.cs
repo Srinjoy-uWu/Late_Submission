@@ -14,6 +14,7 @@ namespace LateSubmission.Interaction
         [Header("Door State")]
         [SerializeField] private bool _isOpen = false;
         [SerializeField] private bool _isLocked = false;
+        [SerializeField] private bool _isPermanentlyLocked = false;
         [SerializeField] private ItemType _requiredKey = ItemType.FacultyKey;
         [SerializeField] private string _lockedMessage = "Locked. Requires Faculty Key.";
 
@@ -45,7 +46,9 @@ namespace LateSubmission.Interaction
         }
 
         public bool IsLocked => _isLocked;
+        public bool IsPermanentlyLocked => _isPermanentlyLocked;
         public bool IsOpen => _isOpen;
+        public ItemType RequiredKey => _requiredKey;
 
         public void SetLocked(bool locked, string message = null)
         {
@@ -60,6 +63,7 @@ namespace LateSubmission.Interaction
         {
             _isOpen = false;
             _isLocked = true;
+            _isPermanentlyLocked = true;
             _lockedMessage = message;
             if (_doorHinge != null)
             {
@@ -72,7 +76,7 @@ namespace LateSubmission.Interaction
         {
             if (_isLocked)
             {
-                if (InventoryManager.Instance != null && InventoryManager.Instance.HasItemType(_requiredKey))
+                if (!_isPermanentlyLocked && InventoryManager.Instance != null && InventoryManager.Instance.HasItemType(_requiredKey))
                 {
                     return "Unlock Door [E]";
                 }
@@ -91,7 +95,7 @@ namespace LateSubmission.Interaction
         {
             if (_isLocked)
             {
-                if (InventoryManager.Instance != null && InventoryManager.Instance.HasItemType(_requiredKey))
+                if (!_isPermanentlyLocked && InventoryManager.Instance != null && InventoryManager.Instance.HasItemType(_requiredKey))
                 {
                     _isLocked = false;
                     ToggleDoor();

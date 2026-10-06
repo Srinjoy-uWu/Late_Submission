@@ -8,6 +8,11 @@ using UnityEngine.InputSystem;
 
 namespace LateSubmission.Weapon
 {
+    public interface IDamageable
+    {
+        void TakeDamage(float amount);
+    }
+
     public interface IStaggerable
     {
         void Stagger(float duration = 3.0f);
@@ -103,14 +108,22 @@ namespace LateSubmission.Weapon
 
             Vector3 hitPoint = ray.origin + ray.direction * _range;
 
-            if (Physics.Raycast(ray, out RaycastHit hit, _range, _hitMask))
+            if (Physics.Raycast(ray, out RaycastHit hit, _range, _hitMask, QueryTriggerInteraction.Ignore))
             {
                 hitPoint = hit.point;
 
-                IStaggerable staggerable = hit.collider.GetComponentInParent<IStaggerable>();
-                if (staggerable != null)
+                IDamageable damageable = hit.collider.GetComponentInParent<IDamageable>();
+                if (damageable != null)
                 {
-                    staggerable.Stagger(_staggerDuration);
+                    damageable.TakeDamage(50f);
+                }
+                else
+                {
+                    IStaggerable staggerable = hit.collider.GetComponentInParent<IStaggerable>();
+                    if (staggerable != null)
+                    {
+                        staggerable.Stagger(_staggerDuration);
+                    }
                 }
             }
 

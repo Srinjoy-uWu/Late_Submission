@@ -13,7 +13,7 @@ namespace LateSubmission.Interaction
     public class Interactor : MonoBehaviour
     {
         [Header("Raycast Settings")]
-        [SerializeField] private float _interactionDistance = 2.5f;
+        [SerializeField] private float _interactionDistance = 3.2f;
         [SerializeField] private LayerMask _interactableMask = ~0;
 
         [Header("Input Fallback")]
@@ -38,6 +38,17 @@ namespace LateSubmission.Interaction
 
         private void Update()
         {
+            var hud = LateSubmission.UI.HUDController.Instance;
+            if (hud != null && (hud.IsNoteOpen || hud.JustClosedNote))
+            {
+                if (CurrentInteractable != null)
+                {
+                    CurrentInteractable = null;
+                    OnInteractableHoverExit?.Invoke();
+                }
+                return;
+            }
+
             PerformHoverRaycast();
             CheckInteractionInput();
         }
@@ -47,19 +58,58 @@ namespace LateSubmission.Interaction
             Transform rayOrigin = _cam != null ? _cam.transform : transform;
             Ray ray = new Ray(rayOrigin.position, rayOrigin.forward);
 
-            if (Physics.Raycast(ray, out RaycastHit hit, _interactionDistance, _interactableMask))
-            {
-                IInteractable interactable = hit.collider.GetComponentInParent<IInteractable>();
+            IInteractable target = null;
 
+            // 1. Direct raycast
+            if (Physics.Raycast(ray, out RaycastHit hit, _interactionDistance, _interactableMask, QueryTriggerInteraction.Collide))
+            {
+                var interactable = hit.collider.GetComponentInParent<IInteractable>();
                 if (interactable != null && interactable.CanInteract(this))
                 {
-                    if (CurrentInteractable != interactable)
-                    {
-                        CurrentInteractable = interactable;
-                        OnInteractableHoverEnter?.Invoke(CurrentInteractable);
-                    }
-                    return;
+                    target = interactable;
                 }
+            }
+
+            // 2. Spherecast fallback (makes small items like notes and keys effortless to target)
+            if (target == null)
+            {
+                if (Physics.SphereCast(ray, 0.16f, out RaycastHit sphereHit, _interactionDistance, _interactableMask, QueryTriggerInteraction.Collide))
+                {
+                    var interactable = sphereHit.collider.GetComponentInParent<IInteractable>();
+                    if (interactable != null && interactable.CanInteract(this))
+                    {
+                        target = interactable;
+                    }
+                }
+            }
+
+            // 3. Multi-hit fallback if grazing a non-interactable table edge or prop
+            if (target == null)
+            {
+                RaycastHit[] hits = Physics.RaycastAll(ray, _interactionDistance, _interactableMask, QueryTriggerInteraction.Collide);
+                if (hits != null && hits.Length > 0)
+                {
+                    Array.Sort(hits, (a, b) => a.distance.CompareTo(b.distance));
+                    foreach (var h in hits)
+                    {
+                        var interactable = h.collider.GetComponentInParent<IInteractable>();
+                        if (interactable != null && interactable.CanInteract(this))
+                        {
+                            target = interactable;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (target != null)
+            {
+                if (CurrentInteractable != target)
+                {
+                    CurrentInteractable = target;
+                    OnInteractableHoverEnter?.Invoke(CurrentInteractable);
+                }
+                return;
             }
 
             if (CurrentInteractable != null)
@@ -79,9 +129,16 @@ namespace LateSubmission.Interaction
                 triggerInteract = true;
             }
 #endif
-            if (Input.GetKeyDown(_interactKey))
+            if (!triggerInteract)
             {
-                triggerInteract = true;
+                try
+                {
+                    if (Input.GetKeyDown(_interactKey))
+                    {
+                        triggerInteract = true;
+                    }
+                }
+                catch {}
             }
 
             if (triggerInteract && CurrentInteractable != null && CurrentInteractable.CanInteract(this))

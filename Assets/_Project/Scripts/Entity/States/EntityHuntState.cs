@@ -20,6 +20,7 @@ namespace LateSubmission.AI
             _entity.Agent.speed = _entity.HuntSpeed;
             _entity.SetHuntAudio(true);
             _lostSightTimer = 0f;
+            EntityController.RaiseHuntStarted();
         }
 
         public void Tick()
@@ -44,6 +45,7 @@ namespace LateSubmission.AI
         public void Exit()
         {
             _entity.SetHuntAudio(false);
+            EntityController.RaiseHuntEnded();
         }
     }
 }

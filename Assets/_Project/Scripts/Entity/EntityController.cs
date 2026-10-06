@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 using LateSubmission.Core;
@@ -13,6 +14,17 @@ namespace LateSubmission.AI
     [RequireComponent(typeof(EntityPerception))]
     public class EntityController : MonoBehaviour, IStaggerable
     {
+        // ── Static events for game-wide audio director ──────────────────────────
+        /// <summary>Fired when The Late One begins hunting the player.</summary>
+        public static event Action OnEntityHuntStarted;
+        /// <summary>Fired when The Late One stops hunting (lost player or staggered).</summary>
+        public static event Action OnEntityHuntEnded;
+
+        /// <summary>Called by EntityHuntState.Enter() to broadcast chase start.</summary>
+        public static void RaiseHuntStarted() => OnEntityHuntStarted?.Invoke();
+        /// <summary>Called by EntityHuntState.Exit() to broadcast chase end.</summary>
+        public static void RaiseHuntEnded()   => OnEntityHuntEnded?.Invoke();
+
         [Header("Movement Speeds")]
         [SerializeField] private float _patrolSpeed = 1.8f;
         [SerializeField] private float _investigateSpeed = 3.2f;
